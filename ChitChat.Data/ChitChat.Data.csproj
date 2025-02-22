@@ -8,8 +8,10 @@
 
   <ItemGroup>
     <Folder Include="Contexts\" />
-    <Folder Include="Entities\" />
-    <Folder Include="Helpers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Bson" Version="3.2.1" />
   </ItemGroup>
 
 </Project>
