@@ -27,6 +27,9 @@ builder.Services.AddAuthenticationService(builder.Configuration);
 //// Change Model State Response Behavior ////
 builder.Services.AddModelStateResponseService();
 
+//// Change Model State Response Behavior ////
+builder.Services.AddMemoryCache();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -36,11 +39,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//// Using Middlewares ////
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-app.UseMiddleware<ApiKeyMiddleware>();
-
 app.UseHttpsRedirection();
+
+//// Using Middlewares ////
+app.UseMiddleware<RateLimitingMiddleware>();
+app.UseMiddleware<ApiKeyMiddleware>();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 
 app.UseAuthorization();
 
