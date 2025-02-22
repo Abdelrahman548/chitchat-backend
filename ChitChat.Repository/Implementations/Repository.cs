@@ -1,4 +1,5 @@
 ﻿using ChitChat.Data.Entities.Abstracts;
+using ChitChat.Repository.Helpers;
 using ChitChat.Repository.Interfaces;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -31,23 +32,26 @@ namespace ChitChat.Repository.Implementations
         public async Task UpdateAsync(ObjectId id, T entity)
             => await _collection.ReplaceOneAsync(e => e.Id == id, entity);
         
-        public async Task<List<T>> GetAllAsync(int page, int pageSize, string? search, bool sortDescending = true)
+
+        public async Task<PagedList<T>> GetAllAsync(ItemQueryParams queryParams)
         {
             var filter = Builders<T>.Filter.Empty;
 
-            if (typeof(SearchableEntity).IsAssignableFrom(typeof(T)) && !string.IsNullOrEmpty(search))
+            if (typeof(SearchableEntity).IsAssignableFrom(typeof(T)) && !string.IsNullOrEmpty(queryParams.Search))
             {
-                filter = Builders<T>.Filter.Regex("storedSearchable", new BsonRegularExpression(search, "i"));
+                filter = Builders<T>.Filter.Regex("storedSearchable", new BsonRegularExpression(queryParams.Search, "i"));
             }
 
-            var sort = sortDescending ? Builders<T>.Sort.Descending(e => e.CreatedAt) : Builders<T>.Sort.Ascending(e => e.CreatedAt);
+            var totalCount = await _collection.CountDocumentsAsync(filter);
 
-            return await _collection.Find(filter)
+            var sort = queryParams.IsDecending ? Builders<T>.Sort.Descending(e => e.CreatedAt) : Builders<T>.Sort.Ascending(e => e.CreatedAt);
+
+            var items = await _collection.Find(filter)
                 .Sort(sort)
-                .Skip((page - 1) * pageSize)
-                .Limit(pageSize)
+                .Skip((queryParams.Page - 1) * queryParams.Limit)
+                .Limit(queryParams.Limit)
                 .ToListAsync();
+            return new PagedList<T>(items, queryParams.Page, queryParams.Limit, (int)totalCount);
         }
-
     }
 }
