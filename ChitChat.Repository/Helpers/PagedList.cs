@@ -3,7 +3,7 @@
 namespace ChitChat.Repository.Helpers
 {
     public class PagedList<T>
-        where T : Entity
+        where T : class
     {
         public List<T> Items { get; set; } = [];
         public int Page { get; set; }
