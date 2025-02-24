@@ -21,6 +21,12 @@ namespace ChitChat.Web.Extensions
             var JwtLifeTime = Environment.GetEnvironmentVariable("JWT_LIFETIME");
             var JwtSigningKey = Environment.GetEnvironmentVariable("JWT_SIGNINGKEY");
             
+            var Smtp = Environment.GetEnvironmentVariable("EMAIL_SMTP");
+            var SenderName = Environment.GetEnvironmentVariable("EMAIL_SENDER_NAME");
+            var SenderEmail = Environment.GetEnvironmentVariable("EMAIL_SENDER_EMAIL");
+            var AppPass = Environment.GetEnvironmentVariable("EMAIL_APP_PASS");
+            var PortSSL = Environment.GetEnvironmentVariable("EMAIL_PORT_SSL");
+            var Port = Environment.GetEnvironmentVariable("EMAIL_PORT");
 
             //// Assign Variables to AppSettings json file ////
             configuration["CLOUDINARY_URL"] = cloudinaryUrl;
@@ -34,6 +40,13 @@ namespace ChitChat.Web.Extensions
             configuration["Jwt:LifeTime"] = JwtLifeTime;
             configuration["Jwt:SigningKey"] = JwtSigningKey;
 
+            configuration["Email:SmtpServer"] = Smtp;
+            configuration["Email:SenderEmail"] = SenderEmail;
+            configuration["Email:SenderName"] = SenderName;
+            configuration["Email:AppPassword"] = AppPass;
+            configuration["Email:PortSSL"] = PortSSL;
+            configuration["Email:Port"] = Port;
+
 
             //// Load Options ////
             var jwtOptions = configuration.GetSection("Jwt").Get<JwtOptions>();
@@ -43,6 +56,10 @@ namespace ChitChat.Web.Extensions
             var MongoOptions = configuration.GetSection("MongoDB").Get<MongoDBOptions>();
             if (MongoOptions is not null)
                 services.AddSingleton(MongoOptions);
+
+            var emailOptions = configuration.GetSection("Email").Get<EmailOptions>();
+            if (emailOptions is not null)
+                services.AddSingleton(emailOptions);
         }
     }
 }
