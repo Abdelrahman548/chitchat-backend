@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 400px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin: 30px auto;
+            text-align: center;
+        }
+        .otp {
+            font-size: 24px;
+            font-weight: bold;
+            background: #007bff;
+            color: #fff;
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        p {
+            color: #333;
+            font-size: 16px;
+        }
+        .footer {
+            font-size: 12px;
+            color: #777;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🔐 OTP Verification</h2>
+        <p>Your One-Time Password (OTP) for verification is:</p>
+        <div class="otp">{{OTP_CODE}}</div>
+        <p>This code is valid for <strong>{{OTP_EXPIRATION_TIME}}</strong>. Do not share it with anyone.</p>
+        <p>If you didn't request this, please ignore this email.</p>
+        <div class="footer">© 2025 {{COMPANY_NAME}}. All rights reserved.</div>
+    </div>
+</body>
+</html>
