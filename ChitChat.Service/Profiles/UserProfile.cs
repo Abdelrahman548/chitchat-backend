@@ -10,7 +10,9 @@ namespace ChitChat.Service.Profiles
         public UserProfile()
         {
             CreateMap<UserRequestDto, User>();
-            CreateMap<User, UserResponseDto>();
+            CreateMap<User, UserResponseDto>().ForMember(dest => dest.LastSeen, opt => opt.MapFrom((src, dest) =>
+                src.LastSeenVisability ? src.LastSeen : null
+            ));
         }
     }
 }
