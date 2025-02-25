@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MongoDB.Bson;
+using System.ComponentModel.DataAnnotations;
 
 namespace ChitChat.Service.DTOs.Request
 {
     public class RefreshRequestDto
     {
+        [Required]
+        public string RefreshToken { get; set; } = string.Empty;
+        [Required]
+        public ObjectId UserId { get; set; }
     }
 }
