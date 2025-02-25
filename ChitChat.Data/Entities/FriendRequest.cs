@@ -3,7 +3,7 @@ using MongoDB.Bson;
 
 namespace ChitChat.Data.Entities
 {
-    public class FriendRequest : Entity
+    public class FriendRequest
     {
         // Nav
         public ObjectId SenderId { get; set; }
