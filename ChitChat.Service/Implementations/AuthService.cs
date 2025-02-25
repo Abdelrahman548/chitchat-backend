@@ -28,7 +28,7 @@ namespace ChitChat.Service.Implementations
         public async Task<BaseResult<string>> ForgetPassword(VerifyEmailRequestDto dto)
         {
             var user = await repoUnit.Users.FindAsync(E => E.Email == dto.Email);
-            if (user is null || user.Count == 0)
+            if (user.Count == 0)
                 return new() { IsSuccess = false, Errors = ["Invalid Email"], StatusCode = MyStatusCode.BadRequest };
             int timeInMinutes = 5;
             string subject = "Your OTP for Email Verfication";
@@ -46,7 +46,7 @@ namespace ChitChat.Service.Implementations
             var otpVerify = await repoUnit.EmailOTPVerfications.FindAsync(E => E.Email == dto.Email);
             var expirationTime = DateTime.UtcNow.AddMinutes(timeInMinutes);
             var hashedOtp = HashingManager.HashPassword(otp);
-            if (otpVerify is null || otpVerify.Count == 0)
+            if (otpVerify.Count == 0)
             {
                 var otpRecord = new EmailOTPVerfication() { Id = ObjectId.GenerateNewId(), Email = user[0].Email, HashedOTP = hashedOtp, ExpirationTime = expirationTime };
                 await repoUnit.EmailOTPVerfications.AddAsync(otpRecord);
@@ -63,11 +63,11 @@ namespace ChitChat.Service.Implementations
         public async Task<BaseResult<LoginResponseDto>> Login(LoginRequestDto dto)
         {
             var banned = await repoUnit.BannedEmails.FindAsync(e => e.Email == dto.Email);
-            if (banned is not null)
+            if (banned.Count != 0)
                 return new() { IsSuccess = false, StatusCode = MyStatusCode.BadRequest, Errors = ["Invalid Email or Password"] };
 
             var users = await repoUnit.Users.FindAsync(e => e.Email == dto.Email);
-            if (users is null || users.Count == 0)
+            if (users.Count == 0)
                 return new() { IsSuccess = false, StatusCode = MyStatusCode.BadRequest, Errors = ["Invalid Email or Password"] };
             if (!HashingManager.VerifyPassword(dto.Password, users[0].Password))
                 return new() { IsSuccess = false, StatusCode = MyStatusCode.BadRequest, Errors = ["Invalid Email or Password"] };
@@ -107,7 +107,7 @@ namespace ChitChat.Service.Implementations
         public async Task<BaseResult<string>> Logout(ObjectId userId)
         {
             var refreshTokenRecord = await repoUnit.RefreshTokens.FindAsync(e => e.UserId == userId);
-            if(refreshTokenRecord is null || refreshTokenRecord.Count == 0)
+            if(refreshTokenRecord.Count == 0)
                 return new() { IsSuccess = false, StatusCode = MyStatusCode.BadRequest, Errors = ["Something went wrong"] };
 
             refreshTokenRecord[0].IsRevoked = true;
@@ -124,7 +124,7 @@ namespace ChitChat.Service.Implementations
             }
 
             var refreshTokenRecord = await repoUnit.RefreshTokens.FindAsync(R => R.UserId == refreshRequest.UserId);
-            if (refreshTokenRecord == null || refreshTokenRecord[0].Token != refreshRequest.RefreshToken || refreshTokenRecord[0].ExpirationTime < DateTime.UtcNow || refreshTokenRecord[0].IsRevoked)
+            if (refreshTokenRecord.Count == 0 || refreshTokenRecord[0].Token != refreshRequest.RefreshToken || refreshTokenRecord[0].ExpirationTime < DateTime.UtcNow || refreshTokenRecord[0].IsRevoked)
             {
                 return new() { IsSuccess = false, Errors = ["Invalid Credintials"], StatusCode = MyStatusCode.BadRequest };
             }
@@ -138,11 +138,11 @@ namespace ChitChat.Service.Implementations
         public async Task<BaseResult<string>> Register(RegisterRequestDto dto)
         {
             var users = await repoUnit.Users.FindAsync(E => E.Email == dto.Email);
-            if (users is not null || users?.Count != 0)
+            if (users?.Count != 0)
                 return new() { IsSuccess = false, Errors = ["Repeated email"], StatusCode = MyStatusCode.BadRequest };
 
             var otpVerify = await repoUnit.EmailOTPVerfications.FindAsync(E => E.Email == dto.Email);
-            if (otpVerify is null || otpVerify.Count != 0)
+            if (otpVerify.Count == 0)
                 return new() { IsSuccess = false, Errors = ["The Email is not verfied"], StatusCode = MyStatusCode.BadRequest };
 
             if (!HashingManager.VerifyPassword(dto.OTPEmailVerifyCode, otpVerify[0].HashedOTP))
@@ -162,7 +162,7 @@ namespace ChitChat.Service.Implementations
         public async Task<BaseResult<string>> ResetPassword(ResetPasswordRequestDto dto)
         {
             var otpVerify = await repoUnit.EmailOTPVerfications.FindAsync(E => E.Email == dto.Email);
-            if (otpVerify is null || otpVerify.Count == 0)
+            if (otpVerify.Count == 0)
                 return new() { IsSuccess = false, Errors = ["Invalid Creadentials"], StatusCode = MyStatusCode.BadRequest };
             if (otpVerify[0].ExpirationTime < DateTime.UtcNow)
                 return new() { IsSuccess = false, Errors = ["Invalid Creadentials"], StatusCode = MyStatusCode.BadRequest };
@@ -170,7 +170,7 @@ namespace ChitChat.Service.Implementations
                 return new() { IsSuccess = false, Errors = ["Invalid Creadentials"], StatusCode = MyStatusCode.BadRequest };
 
             var users = await repoUnit.Users.FindAsync(E => E.Email == dto.Email);
-            if (users is null || users.Count == 0)
+            if (users.Count == 0)
                 return new() { IsSuccess = false, Errors = ["Invalid Email"], StatusCode = MyStatusCode.BadRequest };
 
             users[0].Password = HashingManager.HashPassword(dto.NewPassword);
@@ -185,7 +185,7 @@ namespace ChitChat.Service.Implementations
             string otp = otpService.GenerateOTP();
             try
             {
-                string body = otpService.GetBodyTemplate(otp, timeInMinutes, "TaskManager App");
+                string body = otpService.GetBodyTemplate(otp, timeInMinutes, "ChitChat");
                 await emailService.SendEmailWithHtml($"Guest", dto.Email, subject, body);
             }
             catch
@@ -195,7 +195,7 @@ namespace ChitChat.Service.Implementations
             var otpVerify = await repoUnit.EmailOTPVerfications.FindAsync(E => E.Email == dto.Email);
             var expirationTime = DateTime.UtcNow.AddMinutes(timeInMinutes);
             var hashedOtp = HashingManager.HashPassword(otp);
-            if (otpVerify is null || otpVerify.Count == 0)
+            if (otpVerify.Count == 0)
             {
                 var otpRecord = new EmailOTPVerfication() { Id = ObjectId.GenerateNewId(), Email = dto.Email, HashedOTP = hashedOtp, ExpirationTime = expirationTime };
                 await repoUnit.EmailOTPVerfications.AddAsync(otpRecord);

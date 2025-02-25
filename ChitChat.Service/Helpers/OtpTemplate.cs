@@ -8,7 +8,7 @@
             try
             {
                 string basePath = AppDomain.CurrentDomain.BaseDirectory;
-                string servicePath = Path.Combine(basePath, "..", "..", "..", "..", "TaskManager.Service");
+                string servicePath = Path.Combine(basePath, "..", "..", "..", "..", "ChitChat.Service");
                 string templatePath = Path.Combine(servicePath, "Templates", "otp_template_logo.html");
                 htmlTemplate = File.ReadAllText(templatePath);
             }
