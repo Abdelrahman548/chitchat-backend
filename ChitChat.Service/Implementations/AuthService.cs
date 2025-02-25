@@ -1,4 +1,5 @@
-﻿using ChitChat.Data.Entities;
+﻿using AutoMapper;
+using ChitChat.Data.Entities;
 using ChitChat.Repository.Interfaces;
 using ChitChat.Service.DTOs.Request;
 using ChitChat.Service.DTOs.Response;
@@ -14,13 +15,15 @@ namespace ChitChat.Service.Implementations
         private readonly ITokenService tokenService;
         private readonly IOTPService otpService;
         private readonly IEmailService emailService;
+        private readonly IMapper mapper;
 
-        public AuthService(IUnitOfWork repoUnit, ITokenService tokenService, IOTPService otpService, IEmailService emailService)
+        public AuthService(IUnitOfWork repoUnit, ITokenService tokenService, IOTPService otpService, IEmailService emailService, IMapper mapper)
         {
             this.repoUnit = repoUnit;
             this.tokenService = tokenService;
             this.otpService = otpService;
             this.emailService = emailService;
+            this.mapper = mapper;
         }
         public async Task<BaseResult<string>> ForgetPassword(VerifyEmailRequestDto dto)
         {
@@ -63,20 +66,20 @@ namespace ChitChat.Service.Implementations
             if (banned is not null)
                 return new() { IsSuccess = false, StatusCode = MyStatusCode.BadRequest, Errors = ["Invalid Email or Password"] };
 
-            var user = await repoUnit.Users.FindAsync(e => e.Email == dto.Email);
-            if (user is null)
+            var users = await repoUnit.Users.FindAsync(e => e.Email == dto.Email);
+            if (users is null || users.Count == 0)
                 return new() { IsSuccess = false, StatusCode = MyStatusCode.BadRequest, Errors = ["Invalid Email or Password"] };
-            if (!HashingManager.VerifyPassword(dto.Password, user[0].Password))
+            if (!HashingManager.VerifyPassword(dto.Password, users[0].Password))
                 return new() { IsSuccess = false, StatusCode = MyStatusCode.BadRequest, Errors = ["Invalid Email or Password"] };
 
 
-            var accessToken = tokenService.GenerateAccessToken(user[0]);
+            var accessToken = tokenService.GenerateAccessToken(users[0]);
             var refreshToken = tokenService.GenerateRefreshToken();
             
             RefreshToken refreshTokenRecord;
-            if (ObjectId.Empty != user[0].RefreshTokenId)
+            if (ObjectId.Empty != users[0].RefreshTokenId)
             {
-                refreshTokenRecord = await repoUnit.RefreshTokens.GetByIdAsync(user[0].RefreshTokenId);
+                refreshTokenRecord = await repoUnit.RefreshTokens.GetByIdAsync(users[0].RefreshTokenId);
                 refreshTokenRecord.Token = refreshToken;
                 refreshTokenRecord.IsUsed = false;
             }
@@ -89,14 +92,15 @@ namespace ChitChat.Service.Implementations
                     IsUsed = false, 
                     IsRevoked = false,
                     ExpirationTime = DateTime.UtcNow.AddDays(7), 
-                    UserId = user[0].Id
+                    UserId = users[0].Id
                 };
                 
-                user[0].RefreshTokenId = refreshTokenRecord.Id;
-                await repoUnit.Users.UpdateAsync(user[0].Id, user[0]);
+                users[0].RefreshTokenId = refreshTokenRecord.Id;
+                await repoUnit.Users.UpdateAsync(users[0].Id, users[0]);
                 await repoUnit.RefreshTokens.AddAsync(refreshTokenRecord);
             }
-            var loginResponse = new LoginResponseDto() { Token = new() { AccessToken = accessToken, RefreshToken = refreshToken } };
+            var userResponse = mapper.Map<User, UserResponseDto>(users[0]);
+            var loginResponse = new LoginResponseDto() { Token = new() { AccessToken = accessToken, RefreshToken = refreshToken } , User = userResponse};
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Data = loginResponse, Message = "Logged in successfully"};
         }
 
@@ -126,8 +130,8 @@ namespace ChitChat.Service.Implementations
             }
 
             var newAccessToken = tokenService.GenerateAccessToken(user);
-
-            var loginResponse = new LoginResponseDto() { Token = new() { AccessToken = newAccessToken, RefreshToken = refreshTokenRecord[0].Token }};
+            var userResponse = mapper.Map<User, UserResponseDto>(user);
+            var loginResponse = new LoginResponseDto() { Token = new() { AccessToken = newAccessToken, RefreshToken = refreshTokenRecord[0].Token }, User = userResponse};
             return new() { IsSuccess = true, Data = loginResponse, StatusCode = MyStatusCode.OK };
         }
 
