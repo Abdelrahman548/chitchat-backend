@@ -41,7 +41,7 @@ namespace ChitChat.Web.Controllers
             if (IdStr is null)
             {
                 return Unauthorized(
-                        new BaseResult<Guid>() { IsSuccess = false, Errors = ["UnAuthenticated"], StatusCode = MyStatusCode.Unauthorized }
+                        new BaseResult<string>() { IsSuccess = false, Errors = ["UnAuthenticated"], StatusCode = MyStatusCode.Unauthorized }
                     );
             }
             var result = await services.AuthService.Logout(new(IdStr));
