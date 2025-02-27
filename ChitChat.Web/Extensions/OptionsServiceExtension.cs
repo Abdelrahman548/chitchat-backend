@@ -1,4 +1,5 @@
 ﻿using ChitChat.Service.Helpers;
+using CloudinaryDotNet;
 using DotNetEnv;
 
 namespace ChitChat.Web.Extensions
@@ -49,6 +50,9 @@ namespace ChitChat.Web.Extensions
 
 
             //// Load Options ////
+            var cloudinary = new Cloudinary(cloudinaryUrl);
+            services.AddSingleton(cloudinary);
+
             var jwtOptions = configuration.GetSection("Jwt").Get<JwtOptions>();
             if (jwtOptions is not null)
                 services.AddSingleton(jwtOptions);

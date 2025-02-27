@@ -35,6 +35,7 @@ namespace ChitChat.Data.Entities
         public ICollection<ObjectId> ChatsIds { get; set; } = [];
         public ICollection<ObjectId> BlockedUsersIds { get; set; } = [];
         public ICollection<ObjectId> FriendRequestsIds { get; set; } = [];
+        public ICollection<ObjectId> FriendsIds { get; set; } = [];
 
         public User()
         {

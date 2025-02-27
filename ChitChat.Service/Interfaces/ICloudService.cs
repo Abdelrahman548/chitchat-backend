@@ -5,7 +5,9 @@ namespace ChitChat.Service.Interfaces
 {
     public interface ICloudService
     {
-        Task<BaseResult<string>> UploadImageAsync(IFormFile image);
-        Task<BaseResult<string>> UploadVideoAsync(IFormFile video);
+        Task<bool> DeleteAllByTagAsync(string tag);
+        Task<bool> DeleteResourceByUrlAsync(string url);
+        Task<BaseResult<string>> UploadImageAsync(IFormFile image, string userId);
+        Task<BaseResult<string>> UploadVideoAsync(IFormFile video, string userId);
     }
 }

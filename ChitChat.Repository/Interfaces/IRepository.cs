@@ -13,11 +13,12 @@ namespace ChitChat.Repository.Interfaces
     public interface IRepository<T>
         where T : Entity
     {
-        Task<PagedList<T>> GetAllAsync(ItemQueryParams queryParams);
+        Task<PagedList<T>> GetAllAsync(ItemQueryParams queryParams, Expression<Func<T, bool>> filterExpression = null);
         Task<T> GetByIdAsync(ObjectId id);
         Task<List<T>> FindAsync(Expression<Func<T, bool>> filter);
         Task AddAsync(T entity);
         Task UpdateAsync(ObjectId id, T entity);
         Task DeleteAsync(ObjectId id);
+        Task DeleteAsync(Expression<Func<T, bool>> filter);
     }
 }

@@ -11,7 +11,7 @@ namespace ChitChat.Service.Interfaces
         Task<BaseResult<PagedList<MessageResponseDto>>> GetAll(ObjectId groupId, ItemQueryParams queryParams, ObjectId memberId);
         Task<BaseResult<MessageResponseDto>> GetByID(ObjectId messageId, ObjectId memberId);
         Task<BaseResult<MessageResponseDto>> Add(ObjectId groupId, MessageRequestDto dto, ObjectId senderId);
-        Task<BaseResult<MessageResponseDto>> Update(ObjectId groupId, MessageRequestDto dto, ObjectId senderId);
+        Task<BaseResult<MessageResponseDto>> Update(ObjectId messageId, MessageRequestDto dto, ObjectId senderId);
         Task<BaseResult<string>> Delete(ObjectId groupId, ObjectId messageId, ObjectId senderId);
     }
 }

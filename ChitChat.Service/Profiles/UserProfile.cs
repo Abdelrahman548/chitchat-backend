@@ -13,6 +13,9 @@ namespace ChitChat.Service.Profiles
             CreateMap<User, UserResponseDto>().ForMember(dest => dest.LastSeen, opt => opt.MapFrom((src, dest) =>
                 src.LastSeenVisability ? src.LastSeen : null
             ));
+            CreateMap<User, FriendResponseDto>().ForMember(dest => dest.UserId, opt => opt.MapFrom((src, dest) =>
+                src.Id
+            ));
         }
     }
 }

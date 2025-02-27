@@ -24,6 +24,9 @@ namespace ChitChat.Repository.Implementations
         public async Task DeleteAsync(ObjectId id)
             => await _collection.DeleteOneAsync(e => e.Id == id);
 
+        public async Task DeleteAsync(Expression<Func<T, bool>> filter)
+            => await _collection.DeleteOneAsync(filter);
+
         public async Task<List<T>> FindAsync(Expression<Func<T, bool>> filter)
             => await _collection.Find(filter).ToListAsync();
         public async Task<T> GetByIdAsync(ObjectId id)
@@ -33,9 +36,9 @@ namespace ChitChat.Repository.Implementations
             => await _collection.ReplaceOneAsync(e => e.Id == id, entity);
         
 
-        public async Task<PagedList<T>> GetAllAsync(ItemQueryParams queryParams)
+        public async Task<PagedList<T>> GetAllAsync(ItemQueryParams queryParams, Expression<Func<T, bool>> filterExpression = null)
         {
-            var filter = Builders<T>.Filter.Empty;
+            var filter = filterExpression != null ? Builders<T>.Filter.Where(filterExpression) : Builders<T>.Filter.Empty;
 
             if (typeof(SearchableEntity).IsAssignableFrom(typeof(T)) && !string.IsNullOrEmpty(queryParams.Search))
             {
