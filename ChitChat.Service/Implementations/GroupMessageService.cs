@@ -23,7 +23,7 @@ namespace ChitChat.Service.Implementations
             this.mapper = mapper;
             this.cloudService = cloudService;
         }
-        public async Task<BaseResult<MessageResponseDto>> Add(ObjectId groupId, MessageRequestDto dto, ObjectId senderId)
+        public async Task<BaseResult<MessageResponseDto>> Add(string groupId, MessageRequestDto dto, string senderId)
         {
             var group = await repoUnit.Groups.GetByIdAsync(groupId);
             if (group is null)
@@ -37,11 +37,11 @@ namespace ChitChat.Service.Implementations
             }
             
             var message = mapper.Map<Message>(dto);
-            message.Id = ObjectId.GenerateNewId();
+            message.Id = ObjectId.GenerateNewId().ToString();
             message.ChatId = groupId;
             message.ChatType = ChatType.Group;
             message.SenderId = senderId;
-            message.ReceiverId = ObjectId.Empty;
+            message.ReceiverId = string.Empty;
 
             BaseResult<string> result = null;
             switch (dto.ContentType)
@@ -65,7 +65,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Message = Messages.ADD_SUCCESS, Data = responseDto };
         }
 
-        public async Task<BaseResult<string>> Delete(ObjectId groupId, ObjectId messageId, ObjectId senderId)
+        public async Task<BaseResult<string>> Delete(string groupId, string messageId, string senderId)
         {
             var message = await repoUnit.Messages.GetByIdAsync(messageId);
 
@@ -81,7 +81,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Message = Messages.DELETE_SUCCESS };
         }
 
-        public async Task<BaseResult<PagedList<MessageResponseDto>>> GetAll(ObjectId groupId, ItemQueryParams queryParams, ObjectId memberId)
+        public async Task<BaseResult<PagedList<MessageResponseDto>>> GetAll(string groupId, ItemQueryParams queryParams, string memberId)
         {
             var group = await repoUnit.Groups.GetByIdAsync(groupId);
             
@@ -102,7 +102,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, Data = responsePageList, Message = Messages.GET_SUCCESS, StatusCode = MyStatusCode.OK };
         }
 
-        public async Task<BaseResult<MessageResponseDto>> GetByID(ObjectId messageId, ObjectId memberId)
+        public async Task<BaseResult<MessageResponseDto>> GetByID(string messageId, string memberId)
         {
             var message = await repoUnit.Messages.GetByIdAsync(messageId);
             if (message is null)
@@ -120,7 +120,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Message = Messages.GET_SUCCESS, Data = responseDto };
         }
 
-        public async Task<BaseResult<MessageResponseDto>> Update(ObjectId messageId, MessageRequestDto dto, ObjectId senderId)
+        public async Task<BaseResult<MessageResponseDto>> Update(string messageId, MessageRequestDto dto, string senderId)
         {
             var message = await repoUnit.Messages.GetByIdAsync(messageId);
 

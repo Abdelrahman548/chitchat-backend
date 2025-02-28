@@ -1,6 +1,7 @@
 ﻿using ChitChat.Data.Entities.Abstracts;
 using ChitChat.Data.Helpers;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace ChitChat.Data.Entities
@@ -16,8 +17,10 @@ namespace ChitChat.Data.Entities
         public GroupPermissions Permissions { get; set; }
 
         // Nav
-        public ICollection<ObjectId> MembersIds { get; set; } = [];
-        public ICollection<ObjectId> AdminsIds { get; set; } = [];
+        [BsonRepresentation(BsonType.ObjectId)]
+        public ICollection<string> MembersIds { get; set; } = [];
+        [BsonRepresentation(BsonType.ObjectId)]
+        public ICollection<string> AdminsIds { get; set; } = [];
 
         public Group()
         {

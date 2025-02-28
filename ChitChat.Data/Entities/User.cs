@@ -1,5 +1,6 @@
 ﻿using ChitChat.Data.Entities.Abstracts;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace ChitChat.Data.Entities
@@ -29,13 +30,26 @@ namespace ChitChat.Data.Entities
         public int NumOfBans { get; set; }
 
         // Nav
-        public ObjectId RefreshTokenId { get; set; }
-        public ICollection<ObjectId> GroupsIds { get; set; } = [];
-        public ICollection<ObjectId> StatusIds { get; set; } = [];
-        public ICollection<ObjectId> ChatsIds { get; set; } = [];
-        public ICollection<ObjectId> BlockedUsersIds { get; set; } = [];
-        public ICollection<ObjectId> FriendRequestsIds { get; set; } = [];
-        public ICollection<ObjectId> FriendsIds { get; set; } = [];
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string RefreshTokenId { get; set; } = string.Empty;
+        
+        [BsonRepresentation(BsonType.ObjectId)]
+        public ICollection<string> GroupsIds { get; set; } = [];
+        
+        [BsonRepresentation(BsonType.ObjectId)] 
+        public ICollection<string> StatusIds { get; set; } = [];
+        
+        [BsonRepresentation(BsonType.ObjectId)] 
+        public ICollection<string> ChatsIds { get; set; } = [];
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        public ICollection<string> BlockedUsersIds { get; set; } = [];
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        public ICollection<string> FriendRequestsIds { get; set; } = [];
+        
+        [BsonRepresentation(BsonType.ObjectId)]
+        public ICollection<string> FriendsIds { get; set; } = [];
 
         public User()
         {

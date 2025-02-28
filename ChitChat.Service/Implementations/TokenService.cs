@@ -28,7 +28,7 @@ namespace ChitChat.Service.Implementations
                                     SecurityAlgorithms.HmacSha256),
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new(ClaimTypes.NameIdentifier, person.Id.ToString()),
+                    new(ClaimTypes.NameIdentifier, person.Id),
                     new(ClaimTypes.Name, person.Email),
                     new(ClaimTypes.Role, "User"),
                 }),

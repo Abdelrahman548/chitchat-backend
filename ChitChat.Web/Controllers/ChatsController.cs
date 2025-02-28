@@ -27,13 +27,13 @@ namespace ChitChat.Web.Controllers
         public async Task<ActionResult<BaseResult<MessageResponseDto>>> SendMessage(MessageRequestDto dto)
         {
             BaseResult<MessageResponseDto> result;
-            var IdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (IdStr is null)
+            var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (authId is null)
             {
                 result = new BaseResult<MessageResponseDto>() { IsSuccess = false, Errors = ["UnAuthenticated"], StatusCode = MyStatusCode.Unauthorized };
             }
             else
-                result = await services.ChatMessageService.Add(dto, ObjectId.Parse(IdStr));
+                result = await services.ChatMessageService.Add(dto, authId);
             
             return StatusCode((int)result.StatusCode, result);
         }
@@ -43,45 +43,45 @@ namespace ChitChat.Web.Controllers
         public async Task<ActionResult<BaseResult<MessageResponseDto>>> GetMessage(string messageId)
         {
             BaseResult<MessageResponseDto> result;
-            var IdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (IdStr is null)
+            var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (authId is null)
             {
                 result = new BaseResult<MessageResponseDto>() { IsSuccess = false, Errors = ["UnAuthenticated"], StatusCode = MyStatusCode.Unauthorized };
             }
             else
-                result = await services.ChatMessageService.GetByID(ObjectId.Parse(messageId), ObjectId.Parse(IdStr));
+                result = await services.ChatMessageService.GetByID(messageId, authId);
 
             return StatusCode((int)result.StatusCode, result);
         }
 
         [Authorize(Roles = "User")]
         [HttpDelete("messages")]
-        public async Task<ActionResult<BaseResult<string>>> DeleteMessage(ObjectId messageId)
+        public async Task<ActionResult<BaseResult<string>>> DeleteMessage(string messageId)
         {
             BaseResult<string> result;
-            var IdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (IdStr is null)
+            var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (authId is null)
             {
                 result = new BaseResult<string>() { IsSuccess = false, Errors = ["UnAuthenticated"], StatusCode = MyStatusCode.Unauthorized };
             }
             else
-                result = await services.ChatMessageService.Delete(messageId, ObjectId.Parse(IdStr));
+                result = await services.ChatMessageService.Delete(messageId, authId);
 
             return StatusCode((int)result.StatusCode, result);
         }
         
         [Authorize(Roles = "User")]
         [HttpPut("messages")]
-        public async Task<ActionResult<BaseResult<MessageResponseDto>>> UpdateMessage(ObjectId messageId, [FromBody]MessageRequestDto dto)
+        public async Task<ActionResult<BaseResult<MessageResponseDto>>> UpdateMessage(string messageId, [FromBody]MessageRequestDto dto)
         {
             BaseResult<MessageResponseDto> result;
-            var IdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (IdStr is null)
+            var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (authId is null)
             {
                 result = new BaseResult<MessageResponseDto>() { IsSuccess = false, Errors = ["UnAuthenticated"], StatusCode = MyStatusCode.Unauthorized };
             }
             else
-                result = await services.ChatMessageService.Update(messageId, dto, ObjectId.Parse(IdStr));
+                result = await services.ChatMessageService.Update(messageId, dto, authId);
 
             return StatusCode((int)result.StatusCode, result);
         }
@@ -89,16 +89,16 @@ namespace ChitChat.Web.Controllers
         
         [Authorize(Roles = "User")]
         [HttpGet("")]
-        public async Task<ActionResult<BaseResult<PagedList<MessageResponseDto>>>> GetChat(ObjectId chatId, ItemQueryParams queryParams)
+        public async Task<ActionResult<BaseResult<PagedList<MessageResponseDto>>>> GetChat(string chatId, ItemQueryParams queryParams)
         {
             BaseResult<PagedList<MessageResponseDto>> result;
-            var IdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (IdStr is null)
+            var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (authId is null)
             {
                 result = new BaseResult<PagedList<MessageResponseDto>>() { IsSuccess = false, Errors = ["UnAuthenticated"], StatusCode = MyStatusCode.Unauthorized };
             }
             else
-                result = await services.ChatMessageService.GetAll(chatId,queryParams, ObjectId.Parse(IdStr));
+                result = await services.ChatMessageService.GetAll(chatId,queryParams, authId);
 
             return StatusCode((int)result.StatusCode, result);
         }

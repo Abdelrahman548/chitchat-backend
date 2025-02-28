@@ -8,6 +8,6 @@ namespace ChitChat.Service.DTOs.Request
         [Required]
         public string RefreshToken { get; set; } = string.Empty;
         [Required]
-        public ObjectId UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
     }
 }

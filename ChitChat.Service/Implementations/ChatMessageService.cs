@@ -24,7 +24,7 @@ namespace ChitChat.Service.Implementations
             this.mapper = mapper;
             this.cloudService = cloudService;
         }
-        public async Task<BaseResult<MessageResponseDto>> Add(MessageRequestDto dto, ObjectId senderId)
+        public async Task<BaseResult<MessageResponseDto>> Add(MessageRequestDto dto, string senderId)
         {
             var sender = await repoUnit.Users.GetByIdAsync(senderId);
             if(sender is null)
@@ -35,7 +35,7 @@ namespace ChitChat.Service.Implementations
             Chat chat;
             if (chats.Count == 0)
             {
-                chat = new Chat() { Id = ObjectId.GenerateNewId(), FirstUserId = senderId, SecondUserId = dto.ReceiverId };
+                chat = new Chat() { Id = ObjectId.GenerateNewId().ToString(), FirstUserId = senderId, SecondUserId = dto.ReceiverId };
                 await repoUnit.Chats.AddAsync(chat);
                 
                 var receiver = await repoUnit.Users.GetByIdAsync(dto.ReceiverId);
@@ -47,7 +47,7 @@ namespace ChitChat.Service.Implementations
                 chat = chats[0];
             
             var message = mapper.Map<Message>(dto);
-            message.Id = ObjectId.GenerateNewId();
+            message.Id = ObjectId.GenerateNewId().ToString();
             message.ChatId = chat.Id;
             message.ChatType = ChatType.Private;
             message.SenderId = senderId;
@@ -74,7 +74,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Message = Messages.ADD_SUCCESS, Data = responseDto };
         }
 
-        public async Task<BaseResult<string>> Delete(ObjectId messageId, ObjectId senderId)
+        public async Task<BaseResult<string>> Delete(string messageId, string senderId)
         {
             var message = await repoUnit.Messages.GetByIdAsync(messageId);
 
@@ -90,7 +90,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Message = Messages.DELETE_SUCCESS};
         }
 
-        public async Task<BaseResult<PagedList<MessageResponseDto>>> GetAll(ObjectId chatId, ItemQueryParams queryParams, ObjectId memberId)
+        public async Task<BaseResult<PagedList<MessageResponseDto>>> GetAll(string chatId, ItemQueryParams queryParams, string memberId)
         {
             var chat = await repoUnit.Chats.GetByIdAsync(chatId);
             if (chat.FirstUserId != memberId && chat.SecondUserId != memberId)
@@ -107,7 +107,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, Data = responsePageList, Message = Messages.GET_SUCCESS, StatusCode = MyStatusCode.OK };
         }
 
-        public async Task<BaseResult<MessageResponseDto>> GetByID(ObjectId messageId, ObjectId memberId)
+        public async Task<BaseResult<MessageResponseDto>> GetByID(string messageId, string memberId)
         {
             var message = await repoUnit.Messages.GetByIdAsync(messageId);
             if(message is null)
@@ -119,7 +119,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Message = Messages.GET_SUCCESS, Data = responseDto };
         }
 
-        public async Task<BaseResult<MessageResponseDto>> Update(ObjectId messageId, MessageRequestDto dto, ObjectId senderId)
+        public async Task<BaseResult<MessageResponseDto>> Update(string messageId, MessageRequestDto dto, string senderId)
         {
             var message = await repoUnit.Messages.GetByIdAsync(messageId);
             

@@ -1,6 +1,7 @@
 ﻿using ChitChat.Data.Entities.Abstracts;
 using ChitChat.Data.Helpers;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace ChitChat.Data.Entities
@@ -14,9 +15,14 @@ namespace ChitChat.Data.Entities
         public ContentType ContentType { get; set; }
 
         // Nav
-        public ObjectId SenderId { get; set; }
-        public ObjectId ReceiverId { get; set; }
-        public ObjectId ChatId { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string SenderId { get; set; } = string.Empty;
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string ReceiverId { get; set; } = string.Empty;
+
+        [BsonRepresentation(BsonType.ObjectId)] 
+        public string ChatId { get; set; } = string.Empty;
 
         public Message()
         {

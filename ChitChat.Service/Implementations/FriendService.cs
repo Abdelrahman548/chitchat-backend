@@ -21,7 +21,7 @@ namespace ChitChat.Service.Implementations
             this.mapper = mapper;
         }
 
-        public async Task<BaseResult<string>> Accept(ObjectId friendRequestId, ObjectId senderId)
+        public async Task<BaseResult<string>> Accept(string friendRequestId, string senderId)
         {
             var friendRequest = await repoUnit.FriendRequests.GetByIdAsync(friendRequestId);
             if (friendRequest is null)
@@ -53,7 +53,7 @@ namespace ChitChat.Service.Implementations
             )
                 return new() { IsSuccess = false, Errors = ["User is not Found"], StatusCode = MyStatusCode.BadRequest };
 
-            var friendReq = new FriendRequest() { Id = ObjectId.GenerateNewId(), SenderId = dto.SenderId, ReceiverId = dto.ReceiverId };
+            var friendReq = new FriendRequest() { Id = ObjectId.GenerateNewId().ToString(), SenderId = dto.SenderId, ReceiverId = dto.ReceiverId };
             await repoUnit.FriendRequests.AddAsync(friendReq);
             foreach (var user in users)
             {
@@ -64,7 +64,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, Message = "Friend Request is Sent Successfully", StatusCode = MyStatusCode.OK };
         }
 
-        public async Task<BaseResult<string>> Cancel(ObjectId friendRequestId, ObjectId senderId)
+        public async Task<BaseResult<string>> Cancel(string friendRequestId, string senderId)
         {
             var friendRequest = await repoUnit.FriendRequests.GetByIdAsync(friendRequestId);
             if (friendRequest is null)
@@ -82,7 +82,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, Message = "Friend Request is Canceled Successfully", StatusCode = MyStatusCode.OK };
         }
 
-        public async Task<BaseResult<PagedList<FriendResponseDto>>> GetAll(ItemQueryParams queryParams, ObjectId senderId)
+        public async Task<BaseResult<PagedList<FriendResponseDto>>> GetAll(ItemQueryParams queryParams, string senderId)
         {
             var ids = (await repoUnit.Users.GetByIdAsync(senderId)).FriendRequestsIds;
             var pageList = await repoUnit.Users.GetAllAsync(queryParams, e => e.FriendRequestsIds.Any( id => ids.Contains(id)));
@@ -96,7 +96,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, Data = responsePageList, Message = Messages.GET_SUCCESS, StatusCode = MyStatusCode.OK };
         }
 
-        public async Task<BaseResult<FriendResponseDto>> GetByID(ObjectId friendRequestId, ObjectId senderId)
+        public async Task<BaseResult<FriendResponseDto>> GetByID(string friendRequestId, string senderId)
         {
             var friendRequest = await repoUnit.FriendRequests.GetByIdAsync(friendRequestId);
             if(friendRequest is null)

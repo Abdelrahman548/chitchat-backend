@@ -37,14 +37,14 @@ namespace ChitChat.Web.Controllers
         [HttpPost("logout")]
         public async Task<ActionResult<BaseResult<string>>> Logout()
         {
-            var IdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (IdStr is null)
+            var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (authId is null)
             {
                 return Unauthorized(
                         new BaseResult<string>() { IsSuccess = false, Errors = ["UnAuthenticated"], StatusCode = MyStatusCode.Unauthorized }
                     );
             }
-            var result = await services.AuthService.Logout(new(IdStr));
+            var result = await services.AuthService.Logout(new(authId));
             return StatusCode((int)result.StatusCode, result);
         }
         [HttpPost("register")]

@@ -48,7 +48,7 @@ namespace ChitChat.Service.Implementations
             var hashedOtp = HashingManager.HashPassword(otp);
             if (otpVerify.Count == 0)
             {
-                var otpRecord = new EmailOTPVerfication() { Id = ObjectId.GenerateNewId(), Email = user[0].Email, HashedOTP = hashedOtp, ExpirationTime = expirationTime };
+                var otpRecord = new EmailOTPVerfication() { Id = ObjectId.GenerateNewId().ToString(), Email = user[0].Email, HashedOTP = hashedOtp, ExpirationTime = expirationTime };
                 await repoUnit.EmailOTPVerfications.AddAsync(otpRecord);
             }
             else
@@ -77,7 +77,7 @@ namespace ChitChat.Service.Implementations
             var refreshToken = tokenService.GenerateRefreshToken();
             
             RefreshToken refreshTokenRecord;
-            if (ObjectId.Empty != users[0].RefreshTokenId)
+            if (string.Empty != users[0].RefreshTokenId)
             {
                 refreshTokenRecord = await repoUnit.RefreshTokens.GetByIdAsync(users[0].RefreshTokenId);
                 refreshTokenRecord.Token = refreshToken;
@@ -87,7 +87,7 @@ namespace ChitChat.Service.Implementations
             {
                 refreshTokenRecord = new()
                 {
-                    Id = ObjectId.GenerateNewId(),
+                    Id = ObjectId.GenerateNewId().ToString(),
                     Token = refreshToken,
                     IsUsed = false, 
                     IsRevoked = false,
@@ -104,7 +104,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Data = loginResponse, Message = "Logged in successfully"};
         }
 
-        public async Task<BaseResult<string>> Logout(ObjectId userId)
+        public async Task<BaseResult<string>> Logout(string userId)
         {
             var refreshTokenRecord = await repoUnit.RefreshTokens.FindAsync(e => e.UserId == userId);
             if(refreshTokenRecord.Count == 0)
@@ -152,7 +152,7 @@ namespace ChitChat.Service.Implementations
                 return new() { IsSuccess = false, Errors = ["Invalid Credintials"], StatusCode = MyStatusCode.BadRequest };
 
             var hashedPass = HashingManager.HashPassword(dto.Password);
-            var userRecord = new User() { Id = ObjectId.GenerateNewId(), Email = dto.Email, Password = hashedPass };
+            var userRecord = new User() { Id = ObjectId.GenerateNewId().ToString(), Email = dto.Email, Password = hashedPass };
 
             
             await repoUnit.Users.AddAsync(userRecord);
@@ -197,7 +197,7 @@ namespace ChitChat.Service.Implementations
             var hashedOtp = HashingManager.HashPassword(otp);
             if (otpVerify.Count == 0)
             {
-                var otpRecord = new EmailOTPVerfication() { Id = ObjectId.GenerateNewId(), Email = dto.Email, HashedOTP = hashedOtp, ExpirationTime = expirationTime };
+                var otpRecord = new EmailOTPVerfication() { Id = ObjectId.GenerateNewId().ToString(), Email = dto.Email, HashedOTP = hashedOtp, ExpirationTime = expirationTime };
                 await repoUnit.EmailOTPVerfications.AddAsync(otpRecord);
             }
             else

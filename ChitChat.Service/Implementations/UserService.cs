@@ -19,7 +19,7 @@ namespace ChitChat.Service.Implementations
             this.repoUnit = repoUnit;
             this.mapper = mapper;
         }
-        public async Task<BaseResult<PagedList<UserResponseDto>>> GetAll(ItemQueryParams queryParams, ObjectId senderId)
+        public async Task<BaseResult<PagedList<UserResponseDto>>> GetAll(ItemQueryParams queryParams, string senderId)
         {
             var pageList = await repoUnit.Users.GetAllAsync(queryParams);
             var responsePageList = new PagedList<UserResponseDto>(
@@ -32,7 +32,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, Data = responsePageList, Message = Messages.GET_SUCCESS, StatusCode = MyStatusCode.OK };
         }
 
-        public async Task<BaseResult<UserResponseDto>> GetByID(ObjectId userId)
+        public async Task<BaseResult<UserResponseDto>> GetByID(string userId)
         {
             var user = await repoUnit.Users.GetByIdAsync(userId);
             if (user is null) return new BaseResult<UserResponseDto>() { IsSuccess = false, Errors = ["Not Found"], StatusCode = MyStatusCode.NotFound };
@@ -40,7 +40,7 @@ namespace ChitChat.Service.Implementations
             return new BaseResult<UserResponseDto>() { IsSuccess = true, Data = responseDto, Message = Messages.GET_SUCCESS, StatusCode = MyStatusCode.OK };
         }
 
-        public async Task<BaseResult<ObjectId>> Update(ObjectId userId, UserRequestDto dto, ObjectId senderId)
+        public async Task<BaseResult<string>> Update(string userId, UserRequestDto dto, string senderId)
         {
             var user = await repoUnit.Users.GetByIdAsync(userId);
             if (user is null) return new() { IsSuccess = false, Errors = ["Not Found"], StatusCode = MyStatusCode.NotFound };

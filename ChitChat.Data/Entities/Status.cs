@@ -1,6 +1,7 @@
 ﻿using ChitChat.Data.Entities.Abstracts;
 using ChitChat.Data.Helpers;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace ChitChat.Data.Entities
@@ -14,7 +15,8 @@ namespace ChitChat.Data.Entities
         public DateTime ExpirationTime { get; set; }
 
         // Nav
-        public ObjectId UserId { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string UserId { get; set; } = string.Empty;
 
     }
 }

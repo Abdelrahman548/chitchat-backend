@@ -8,7 +8,7 @@ namespace ChitChat.Service.Interfaces
     public interface IAuthService
     {
         Task<BaseResult<LoginResponseDto>> Login(LoginRequestDto dto);
-        Task<BaseResult<string>> Logout(ObjectId userId);
+        Task<BaseResult<string>> Logout(string userId);
         Task<BaseResult<string>> Register(RegisterRequestDto dto);
         Task<BaseResult<string>> ForgetPassword(VerifyEmailRequestDto dto);
         Task<BaseResult<string>> ResetPassword(ResetPasswordRequestDto dto);

@@ -24,7 +24,7 @@ namespace ChitChat.Service.Implementations
             this.mapper = mapper;
             this.cloudService = cloudService;
         }
-        public async Task<BaseResult<PagedList<GroupResponseDto>>> GetAll(ItemQueryParams queryParams, ObjectId senderId)
+        public async Task<BaseResult<PagedList<GroupResponseDto>>> GetAll(ItemQueryParams queryParams, string senderId)
         {
             var pageList = await repoUnit.Groups.GetAllAsync(queryParams, g => g.Visability == Visability.Public || g.MembersIds.Contains(senderId));
             var responsePageList = new PagedList<GroupResponseDto>(
@@ -37,7 +37,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, Data = responsePageList, Message = Messages.GET_SUCCESS, StatusCode = MyStatusCode.OK };
         }
 
-        public async Task<BaseResult<GroupResponseDto>> GetByID(ObjectId groupId, ObjectId senderId)
+        public async Task<BaseResult<GroupResponseDto>> GetByID(string groupId, string senderId)
         {
             var group = await repoUnit.Groups.GetByIdAsync(groupId);
             if (group is null)
@@ -49,13 +49,13 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, Data = responseDto, Message = Messages.GET_SUCCESS, StatusCode = MyStatusCode.OK };
         }
 
-        public async Task<BaseResult<GroupResponseDto>> Add(GroupRequestDto dto, ObjectId senderId)
+        public async Task<BaseResult<GroupResponseDto>> Add(GroupRequestDto dto, string senderId)
         {
             var user = await repoUnit.Users.GetByIdAsync(senderId);
             if (user is null)
                 return new() { IsSuccess = false, StatusCode = MyStatusCode.BadRequest, Errors = ["User is not Found"] };
             var group = mapper.Map<Group>(dto);
-            group.Id = ObjectId.GenerateNewId();
+            group.Id = ObjectId.GenerateNewId().ToString();
             group.AdminsIds.Add(senderId);
             group.MembersIds.Add(senderId);
             group.Permissions = GroupPermissions.AddMembers | GroupPermissions.SendMessages | GroupPermissions.EditGroup;
@@ -67,7 +67,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Message = Messages.ADD_SUCCESS, Data = responseDto};
         }
 
-        public async Task<BaseResult<string>> UploadPicture(ObjectId groupId, IFormFile image, ObjectId senderId)
+        public async Task<BaseResult<string>> UploadPicture(string groupId, IFormFile image, string senderId)
         {
             var group = await repoUnit.Groups.GetByIdAsync(groupId);
             if(group is null)
@@ -101,7 +101,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Message = Messages.UPDATE_SUCCESS};
         }
 
-        public async Task<BaseResult<string>> Update(ObjectId groupId, GroupRequestDto dto, ObjectId senderId)
+        public async Task<BaseResult<string>> Update(string groupId, GroupRequestDto dto, string senderId)
         {
             var group = await repoUnit.Groups.GetByIdAsync(groupId);
             if (group is null)
@@ -132,7 +132,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Message = Messages.UPDATE_SUCCESS };
         }
 
-        public async Task<BaseResult<string>> AddMember(ObjectId groupId, ObjectId userId, ObjectId senderId)
+        public async Task<BaseResult<string>> AddMember(string groupId, string userId, string senderId)
         {
             var group = await repoUnit.Groups.GetByIdAsync(groupId);
             if (group is null)
@@ -160,7 +160,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Message = Messages.UPDATE_SUCCESS };
         }
 
-        public async Task<BaseResult<string>> RemoveMember(ObjectId groupId, ObjectId memberId, ObjectId senderId)
+        public async Task<BaseResult<string>> RemoveMember(string groupId, string memberId, string senderId)
         {
             var group = await repoUnit.Groups.GetByIdAsync(groupId);
             if (group is null)
@@ -178,7 +178,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Message = Messages.UPDATE_SUCCESS };
         }
 
-        public async Task<BaseResult<string>> AddAdmin(ObjectId groupId, ObjectId memberId, ObjectId senderId)
+        public async Task<BaseResult<string>> AddAdmin(string groupId, string memberId, string senderId)
         {
             var group = await repoUnit.Groups.GetByIdAsync(groupId);
             if (group is null)
@@ -198,7 +198,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Message = Messages.ADD_SUCCESS };
         }
 
-        public async Task<BaseResult<string>> RemoveAdmin(ObjectId groupId, ObjectId adminId, ObjectId senderId)
+        public async Task<BaseResult<string>> RemoveAdmin(string groupId, string adminId, string senderId)
         {
             var group = await repoUnit.Groups.GetByIdAsync(groupId);
             if (group is null)

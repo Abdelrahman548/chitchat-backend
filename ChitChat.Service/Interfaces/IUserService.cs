@@ -8,8 +8,8 @@ namespace ChitChat.Service.Interfaces
 {
     public interface IUserService
     {
-        Task<BaseResult<PagedList<UserResponseDto>>> GetAll(ItemQueryParams queryParams, ObjectId senderId);
-        Task<BaseResult<UserResponseDto>> GetByID(ObjectId userId);
-        Task<BaseResult<ObjectId>> Update(ObjectId userId, UserRequestDto dto, ObjectId senderId);
+        Task<BaseResult<PagedList<UserResponseDto>>> GetAll(ItemQueryParams queryParams, string senderId);
+        Task<BaseResult<UserResponseDto>> GetByID(string userId);
+        Task<BaseResult<string>> Update(string userId, UserRequestDto dto, string senderId);
     }
 }

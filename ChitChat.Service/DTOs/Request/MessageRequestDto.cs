@@ -17,6 +17,6 @@ namespace ChitChat.Service.DTOs.Request
 
         // Nav
         [Required]
-        public ObjectId ReceiverId { get; set; }
+        public string ReceiverId { get; set; } = string.Empty;
     }
 }

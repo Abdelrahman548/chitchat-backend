@@ -23,13 +23,13 @@ namespace ChitChat.Service.Implementations
             this.mapper = mapper;
             this.cloudService = cloudService;
         }
-        public async Task<BaseResult<StatusResponseDto>> Add(ObjectId userId, StatusRequestDto dto)
+        public async Task<BaseResult<StatusResponseDto>> Add(string userId, StatusRequestDto dto)
         {
             var user = await repoUnit.Users.GetByIdAsync(userId);
             if (user is null)
                 return new() { IsSuccess = false, StatusCode = MyStatusCode.BadRequest, Errors = ["Not Found"] };
             
-            Status status = new Status() { Id = ObjectId.GenerateNewId(), ContentType = dto.ContentType, ExpirationTime = DateTime.UtcNow.AddDays(1), Text = dto.Text, UserId = userId };
+            Status status = new Status() { Id = ObjectId.GenerateNewId().ToString(), ContentType = dto.ContentType, ExpirationTime = DateTime.UtcNow.AddDays(1), Text = dto.Text, UserId = userId };
             user.StatusIds.Add(status.Id);
             BaseResult<string>? result = null;
             switch (dto.ContentType)
@@ -55,7 +55,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Data = responseDto , Message = Messages.ADD_SUCCESS};
         }
 
-        public async Task<BaseResult<string>> Delete(ObjectId statusId, ObjectId senderId)
+        public async Task<BaseResult<string>> Delete(string statusId, string senderId)
         {
             var status = await repoUnit.Statuses.GetByIdAsync(statusId);
             if (status is null)
@@ -82,7 +82,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Message = Messages.DELETE_SUCCESS };
         }
 
-        public async Task<BaseResult<PagedList<StatusResponseDto>>> GetAll(ObjectId userId, ItemQueryParams queryParams, ObjectId senderId)
+        public async Task<BaseResult<PagedList<StatusResponseDto>>> GetAll(string userId, ItemQueryParams queryParams, string senderId)
         {
             var user = await repoUnit.Users.GetByIdAsync(senderId);
             if(!user.FriendsIds.Contains(userId))
@@ -99,7 +99,7 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, Data = responsePageList, Message = Messages.GET_SUCCESS, StatusCode = MyStatusCode.OK };
         }
 
-        public async Task<BaseResult<StatusResponseDto>> GetByID(ObjectId statusId, ObjectId senderId)
+        public async Task<BaseResult<StatusResponseDto>> GetByID(string statusId, string senderId)
         {
             var status = await repoUnit.Statuses.GetByIdAsync(statusId);
             if (status is null)

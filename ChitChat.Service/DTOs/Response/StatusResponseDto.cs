@@ -13,6 +13,6 @@ namespace ChitChat.Service.DTOs.Response
         public DateTime ExpirationTime { get; set; }
 
         // Nav
-        public ObjectId UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
     }
 }

@@ -6,8 +6,8 @@ namespace ChitChat.Service.DTOs.Request
     public class FriendRequestDto
     {
         [Required]
-        public ObjectId SenderId { get; set; }
+        public string SenderId { get; set; } = string.Empty;
         [Required]
-        public ObjectId ReceiverId { get; set; }
+        public string ReceiverId { get; set; } = string.Empty;
     }
 }

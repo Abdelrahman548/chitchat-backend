@@ -12,7 +12,7 @@ namespace ChitChat.Service.DTOs.Response
         public ContentType ContentType { get; set; }
 
         // Nav
-        public ObjectId SenderId { get; set; }
-        public ObjectId ChatId { get; set; }
+        public string SenderId { get; set; } = string.Empty;
+        public string ChatId { get; set; } = string.Empty;
     }
 }

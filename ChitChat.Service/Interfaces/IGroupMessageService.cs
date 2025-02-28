@@ -8,10 +8,10 @@ namespace ChitChat.Service.Interfaces
 {
     public interface IGroupMessageService
     {
-        Task<BaseResult<PagedList<MessageResponseDto>>> GetAll(ObjectId groupId, ItemQueryParams queryParams, ObjectId memberId);
-        Task<BaseResult<MessageResponseDto>> GetByID(ObjectId messageId, ObjectId memberId);
-        Task<BaseResult<MessageResponseDto>> Add(ObjectId groupId, MessageRequestDto dto, ObjectId senderId);
-        Task<BaseResult<MessageResponseDto>> Update(ObjectId messageId, MessageRequestDto dto, ObjectId senderId);
-        Task<BaseResult<string>> Delete(ObjectId groupId, ObjectId messageId, ObjectId senderId);
+        Task<BaseResult<PagedList<MessageResponseDto>>> GetAll(string groupId, ItemQueryParams queryParams, string memberId);
+        Task<BaseResult<MessageResponseDto>> GetByID(string messageId, string memberId);
+        Task<BaseResult<MessageResponseDto>> Add(string groupId, MessageRequestDto dto, string senderId);
+        Task<BaseResult<MessageResponseDto>> Update(string messageId, MessageRequestDto dto, string senderId);
+        Task<BaseResult<string>> Delete(string groupId, string messageId, string senderId);
     }
 }

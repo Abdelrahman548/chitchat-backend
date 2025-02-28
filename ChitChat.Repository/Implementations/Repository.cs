@@ -21,7 +21,7 @@ namespace ChitChat.Repository.Implementations
         public async Task AddAsync(T entity)
             => await _collection.InsertOneAsync(entity);
 
-        public async Task DeleteAsync(ObjectId id)
+        public async Task DeleteAsync(string id)
             => await _collection.DeleteOneAsync(e => e.Id == id);
 
         public async Task DeleteAsync(Expression<Func<T, bool>> filter)
@@ -29,10 +29,10 @@ namespace ChitChat.Repository.Implementations
 
         public async Task<List<T>> FindAsync(Expression<Func<T, bool>> filter)
             => await _collection.Find(filter).ToListAsync();
-        public async Task<T> GetByIdAsync(ObjectId id)
+        public async Task<T> GetByIdAsync(string id)
             => await _collection.Find(e => e.Id == id).FirstOrDefaultAsync();
 
-        public async Task UpdateAsync(ObjectId id, T entity)
+        public async Task UpdateAsync(string id, T entity)
             => await _collection.ReplaceOneAsync(e => e.Id == id, entity);
         
 

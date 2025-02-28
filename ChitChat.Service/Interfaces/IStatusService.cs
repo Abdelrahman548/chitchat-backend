@@ -8,9 +8,9 @@ namespace ChitChat.Service.Interfaces
 {
     public interface IStatusService
     {
-        Task<BaseResult<PagedList<StatusResponseDto>>> GetAll(ObjectId userId, ItemQueryParams queryParams, ObjectId senderId);
-        Task<BaseResult<StatusResponseDto>> GetByID(ObjectId statusId, ObjectId senderId);
-        Task<BaseResult<StatusResponseDto>> Add(ObjectId userId, StatusRequestDto dto);
-        Task<BaseResult<string>> Delete(ObjectId statusId, ObjectId senderId);
+        Task<BaseResult<PagedList<StatusResponseDto>>> GetAll(string userId, ItemQueryParams queryParams, string senderId);
+        Task<BaseResult<StatusResponseDto>> GetByID(string statusId, string senderId);
+        Task<BaseResult<StatusResponseDto>> Add(string userId, StatusRequestDto dto);
+        Task<BaseResult<string>> Delete(string statusId, string senderId);
     }
 }
