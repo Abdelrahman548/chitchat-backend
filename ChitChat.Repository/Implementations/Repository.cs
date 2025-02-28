@@ -48,22 +48,28 @@ namespace ChitChat.Repository.Implementations
 
         public async Task<PagedList<T>> GetAllAsync(ItemQueryParams queryParams, Expression<Func<T, bool>> filterExpression = null)
         {
-            var filter = filterExpression != null ? Builders<T>.Filter.Where(filterExpression) : Builders<T>.Filter.Empty;
+            var filters = new List<FilterDefinition<T>>();
+
+            if (filterExpression != null)
+                filters.Add(Builders<T>.Filter.Where(filterExpression));
 
             if (typeof(SearchableEntity).IsAssignableFrom(typeof(T)) && !string.IsNullOrEmpty(queryParams.Search))
-            {
-                filter = Builders<T>.Filter.Regex("storedSearchable", new BsonRegularExpression(queryParams.Search, "i"));
-            }
+                filters.Add(Builders<T>.Filter.Regex("searchable", new BsonRegularExpression(queryParams.Search, "i")));
+
+            var filter = filters.Any() ? Builders<T>.Filter.And(filters) : Builders<T>.Filter.Empty;
 
             var totalCount = await _collection.CountDocumentsAsync(filter);
 
-            var sort = queryParams.IsDecending ? Builders<T>.Sort.Descending(e => e.CreatedAt) : Builders<T>.Sort.Ascending(e => e.CreatedAt);
+            var sort = queryParams.IsDecending
+                ? Builders<T>.Sort.Descending(e => e.CreatedAt)
+                : Builders<T>.Sort.Ascending(e => e.CreatedAt);
 
             var items = await _collection.Find(filter)
                 .Sort(sort)
                 .Skip((queryParams.Page - 1) * queryParams.Limit)
                 .Limit(queryParams.Limit)
                 .ToListAsync();
+
             return new PagedList<T>(items, queryParams.Page, queryParams.Limit, (int)totalCount);
         }
     }
