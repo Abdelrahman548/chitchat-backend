@@ -24,7 +24,7 @@ namespace ChitChat.Service.Implementations
             this.mapper = mapper;
             this.cloudService = cloudService;
         }
-        public async Task<BaseResult<PagedList<GroupResponseDto>>> GetAll(ItemQueryParams queryParams, string senderId)
+        public async Task<BaseResult<PagedList<GroupResponseDto>>> GetAllGroups(ItemQueryParams queryParams, string senderId)
         {
             var pageList = await repoUnit.Groups.GetAllAsync(queryParams, g => g.Visability == Visability.Public || g.MembersIds.Contains(senderId));
             var responsePageList = new PagedList<GroupResponseDto>(
@@ -214,6 +214,66 @@ namespace ChitChat.Service.Implementations
             await repoUnit.Groups.UpdateAsync(groupId, group);
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Message = Messages.UPDATE_SUCCESS};
         }
-    
+
+        public async Task<BaseResult<PagedList<UserResponseDto>>> GetAllGroupMembers(string groupId, ItemQueryParams queryParams, string senderId)
+        {
+            var group = await repoUnit.Groups.GetByIdAsync(groupId);
+            if(group is null)
+                return new() { IsSuccess = false, Errors = ["Group is not found"], StatusCode = MyStatusCode.BadRequest };
+
+            if (group.Visability == Visability.Private && !group.MembersIds.Contains(senderId))
+                return new() { IsSuccess = false, Errors = ["Forbidden"], StatusCode = MyStatusCode.Forbidden };
+
+            var membersIDs = group.MembersIds;
+
+            var pageList = await repoUnit.Users.GetAllAsync(queryParams, u => membersIDs.Contains(u.Id));
+            var responsePageList = new PagedList<UserResponseDto>(
+                                    pageList.Items.Select(item => mapper.Map<UserResponseDto>(item)).ToList(),
+                                    pageList.Page,
+                                    pageList.PageSize,
+                                    pageList.TotalCount
+            );
+
+            return new() { IsSuccess = true, Data = responsePageList, Message = Messages.GET_SUCCESS, StatusCode = MyStatusCode.OK };
+        }
+
+        public async Task<BaseResult<PagedList<UserResponseDto>>> GetAllGroupAdmins(string groupId, ItemQueryParams queryParams, string senderId)
+        {
+            var group = await repoUnit.Groups.GetByIdAsync(groupId);
+            if (group is null)
+                return new() { IsSuccess = false, Errors = ["Group is not found"], StatusCode = MyStatusCode.BadRequest };
+            
+            if(group.Visability == Visability.Private && !group.MembersIds.Contains(senderId))
+                return new() { IsSuccess = false, Errors = ["Forbidden"], StatusCode = MyStatusCode.Forbidden};
+
+
+            var adminsIDs = group.AdminsIds;
+
+            var pageList = await repoUnit.Users.GetAllAsync(queryParams, u => adminsIDs.Contains(u.Id));
+            var responsePageList = new PagedList<UserResponseDto>(
+                                    pageList.Items.Select(item => mapper.Map<UserResponseDto>(item)).ToList(),
+                                    pageList.Page,
+                                    pageList.PageSize,
+                                    pageList.TotalCount
+            );
+
+            return new() { IsSuccess = true, Data = responsePageList, Message = Messages.GET_SUCCESS, StatusCode = MyStatusCode.OK };
+        }
+
+        public async Task<BaseResult<PagedList<GroupResponseDto>>> GetAllUserGroups(ItemQueryParams queryParams, string senderId)
+        {
+            var user = await repoUnit.Users.GetByIdAsync(senderId);
+            if (user is null)
+                return new() { IsSuccess = false, Errors = ["User is not found"], StatusCode = MyStatusCode.BadRequest };
+            var pageList = await repoUnit.Groups.GetAllAsync(queryParams, g => user.GroupsIds.Contains(g.Id));
+            var responsePageList = new PagedList<GroupResponseDto>(
+                                    pageList.Items.Select(item => mapper.Map<GroupResponseDto>(item)).ToList(),
+                                    pageList.Page,
+                                    pageList.PageSize,
+                                    pageList.TotalCount
+            );
+
+            return new() { IsSuccess = true, Data = responsePageList, Message = Messages.GET_SUCCESS, StatusCode = MyStatusCode.OK };
+        }
     }
 }

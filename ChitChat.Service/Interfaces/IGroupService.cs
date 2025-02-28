@@ -9,15 +9,21 @@ namespace ChitChat.Service.Interfaces
 {
     public interface IGroupService
     {
-        Task<BaseResult<PagedList<GroupResponseDto>>> GetAll(ItemQueryParams queryParams, string senderId);
-        Task<BaseResult<GroupResponseDto>> GetByID(string groupId, string senderId);
+        Task<BaseResult<PagedList<GroupResponseDto>>> GetAllGroups(ItemQueryParams queryParams, string senderId);
+        Task<BaseResult<PagedList<UserResponseDto>>> GetAllGroupMembers(string groupId, ItemQueryParams queryParams, string senderId);
+        Task<BaseResult<PagedList<UserResponseDto>>> GetAllGroupAdmins(string groupId, ItemQueryParams queryParams, string senderId);
+        Task<BaseResult<PagedList<GroupResponseDto>>> GetAllUserGroups(ItemQueryParams queryParams, string senderId);
+        
         Task<BaseResult<GroupResponseDto>> Add(GroupRequestDto dto, string senderId);
+        Task<BaseResult<GroupResponseDto>> GetByID(string groupId, string senderId);
+        Task<BaseResult<string>> Update(string groupId, GroupRequestDto dto, string adminId);
         Task<BaseResult<string>> UploadPicture(string groupId, IFormFile image, string senderId);
+
         Task<BaseResult<string>> AddMember(string groupId, string userId, string senderId);
         Task<BaseResult<string>> RemoveMember(string groupId, string memberId, string senderId);
         Task<BaseResult<string>> AddAdmin(string groupId, string memberId, string senderId);
         Task<BaseResult<string>> RemoveAdmin(string groupId, string adminId, string senderId);
-        Task<BaseResult<string>> Update(string groupId, GroupRequestDto dto, string adminId);
+        
         //Task<BaseResult<string>> Delete(ObjectId groupId, ObjectId adminId);
         
     }
