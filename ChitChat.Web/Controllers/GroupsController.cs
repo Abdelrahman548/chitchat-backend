@@ -99,7 +99,7 @@ namespace ChitChat.Web.Controllers
 
 
         [HttpGet("{groupId}/admins")]
-        public async Task<ActionResult<BaseResult<PagedList<UserResponseDto>>>> GetGroupAdmins(string groupId, ItemQueryParams queryParams)
+        public async Task<ActionResult<BaseResult<PagedList<UserResponseDto>>>> GetGroupAdmins(string groupId, [FromQuery] ItemQueryParams queryParams)
         {
             BaseResult<PagedList<UserResponseDto>> result;
             var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -147,7 +147,7 @@ namespace ChitChat.Web.Controllers
         
         
         [HttpGet("{groupId}/members")]
-        public async Task<ActionResult<BaseResult<PagedList<UserResponseDto>>>> GetGroupMembers(string groupId, ItemQueryParams queryParams)
+        public async Task<ActionResult<BaseResult<PagedList<UserResponseDto>>>> GetGroupMembers(string groupId, [FromQuery] ItemQueryParams queryParams)
         {
             BaseResult<PagedList<UserResponseDto>> result;
             var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);
