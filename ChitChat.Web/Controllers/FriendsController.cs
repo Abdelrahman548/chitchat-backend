@@ -11,6 +11,7 @@ namespace ChitChat.Web.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "User")]
     public class FriendsController : ControllerBase
     {
         private readonly ServicesUnit services;
@@ -20,7 +21,6 @@ namespace ChitChat.Web.Controllers
             this.services = services;
         }
 
-        [Authorize(Roles = "User")]
         [HttpPost("requests/send")]
         public async Task<ActionResult<BaseResult<FriendResponseDto>>> Send(FriendRequestDto dto)
         {
@@ -36,7 +36,6 @@ namespace ChitChat.Web.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        [Authorize(Roles = "User")]
         [HttpPost("requests/{friendRequestId}/accept")]
         public async Task<ActionResult<BaseResult<string>>> Accept(string friendRequestId)
         {
@@ -51,7 +50,6 @@ namespace ChitChat.Web.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        [Authorize(Roles = "User")]
         [HttpPost("requests/{friendRequestId}/cancel")]
         public async Task<ActionResult<BaseResult<string>>> Cancel(string friendRequestId)
         {
@@ -66,7 +64,6 @@ namespace ChitChat.Web.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        [Authorize(Roles = "User")]
         [HttpGet("requests/{friendRequestId}")]
         public async Task<ActionResult<BaseResult<FriendResponseDto>>> Get(string friendRequestId)
         {
@@ -94,6 +91,7 @@ namespace ChitChat.Web.Controllers
             var result = await services.FriendService.GetAllSent(queryParams, authId);
             return StatusCode((int)result.StatusCode, result);
         }
+
         [HttpGet("requests/received")]
         public async Task<ActionResult<BaseResult<string>>> GetUserReceivedFriendRequests([FromQuery] ItemQueryParams queryParams)
         {

@@ -11,6 +11,7 @@ namespace ChitChat.Web.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "User")]
     public class ChatsController : ControllerBase
     {
         private readonly ServicesUnit services;
@@ -20,7 +21,7 @@ namespace ChitChat.Web.Controllers
             this.services = services;
         }
 
-        [Authorize(Roles = "User")]
+        
         [HttpPost("messages")]
         public async Task<ActionResult<BaseResult<MessageResponseDto>>> SendMessage(MessageRequestDto dto)
         {
@@ -36,7 +37,6 @@ namespace ChitChat.Web.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
         
-        [Authorize(Roles = "User")]
         [HttpGet("messages")]
         public async Task<ActionResult<BaseResult<MessageResponseDto>>> GetMessage(string messageId)
         {
@@ -52,7 +52,6 @@ namespace ChitChat.Web.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        [Authorize(Roles = "User")]
         [HttpDelete("messages")]
         public async Task<ActionResult<BaseResult<string>>> DeleteMessage(string messageId)
         {
@@ -68,7 +67,6 @@ namespace ChitChat.Web.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
         
-        [Authorize(Roles = "User")]
         [HttpPut("messages")]
         public async Task<ActionResult<BaseResult<MessageResponseDto>>> UpdateMessage(string messageId, MessageRequestDto dto)
         {
@@ -84,8 +82,6 @@ namespace ChitChat.Web.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        
-        [Authorize(Roles = "User")]
         [HttpGet("")]
         public async Task<ActionResult<BaseResult<PagedList<MessageResponseDto>>>> GetChat(string chatId, [FromQuery] ItemQueryParams queryParams)
         {
@@ -100,5 +96,6 @@ namespace ChitChat.Web.Controllers
 
             return StatusCode((int)result.StatusCode, result);
         }
+    
     }
 }
