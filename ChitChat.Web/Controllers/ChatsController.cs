@@ -1,12 +1,10 @@
-﻿using ChitChat.Data.Entities;
-using ChitChat.Repository.Helpers;
+﻿using ChitChat.Repository.Helpers;
 using ChitChat.Service.DTOs.Request;
 using ChitChat.Service.DTOs.Response;
 using ChitChat.Service.Helpers;
 using ChitChat.Service.Implementations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 using System.Security.Claims;
 
 namespace ChitChat.Web.Controllers
@@ -72,7 +70,7 @@ namespace ChitChat.Web.Controllers
         
         [Authorize(Roles = "User")]
         [HttpPut("messages")]
-        public async Task<ActionResult<BaseResult<MessageResponseDto>>> UpdateMessage(string messageId, [FromBody]MessageRequestDto dto)
+        public async Task<ActionResult<BaseResult<MessageResponseDto>>> UpdateMessage(string messageId, MessageRequestDto dto)
         {
             BaseResult<MessageResponseDto> result;
             var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -89,7 +87,7 @@ namespace ChitChat.Web.Controllers
         
         [Authorize(Roles = "User")]
         [HttpGet("")]
-        public async Task<ActionResult<BaseResult<PagedList<MessageResponseDto>>>> GetChat(string chatId, ItemQueryParams queryParams)
+        public async Task<ActionResult<BaseResult<PagedList<MessageResponseDto>>>> GetChat(string chatId, [FromQuery] ItemQueryParams queryParams)
         {
             BaseResult<PagedList<MessageResponseDto>> result;
             var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);

@@ -9,7 +9,9 @@ namespace ChitChat.Service.Interfaces
 {
     public interface IFriendService
     {
-        Task<BaseResult<PagedList<FriendResponseDto>>> GetAll(ItemQueryParams queryParams, string senderId);
+        Task<BaseResult<PagedList<FriendResponseDto>>> GetAllSent(ItemQueryParams queryParams, string senderId);
+        Task<BaseResult<PagedList<FriendResponseDto>>> GetAllReceived(ItemQueryParams queryParams, string senderId);
+        Task<BaseResult<PagedList<UserResponseDto>>> GetAllFriends(ItemQueryParams queryParams, string senderId);
         Task<BaseResult<FriendResponseDto>> GetByID(string friendRequestId, string senderId);
         Task<BaseResult<string>> Add(FriendRequestDto dto);
         Task<BaseResult<string>> Cancel(string friendRequestId, string senderId);

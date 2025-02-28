@@ -47,6 +47,22 @@ namespace ChitChat.Web.Controllers
             var result = await services.AuthService.Logout(new(authId));
             return StatusCode((int)result.StatusCode, result);
         }
+
+        [Authorize(Roles = "User")]
+        [HttpGet("")]
+        public async Task<ActionResult<BaseResult<UserResponseDto>>> Current()
+        {
+            var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (authId is null)
+            {
+                return Unauthorized(
+                        new BaseResult<string>() { IsSuccess = false, Errors = ["UnAuthenticated"], StatusCode = MyStatusCode.Unauthorized }
+                    );
+            }
+            var result = await services.UserService.GetByID(new(authId));
+            return StatusCode((int)result.StatusCode, result);
+        }
+
         [HttpPost("register")]
         public async Task<ActionResult<BaseResult<string>>> Register(RegisterRequestDto dto)
         {

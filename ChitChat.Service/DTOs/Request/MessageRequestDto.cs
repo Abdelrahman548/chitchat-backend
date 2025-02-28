@@ -1,6 +1,5 @@
 ﻿using ChitChat.Data.Helpers;
 using Microsoft.AspNetCore.Http;
-using MongoDB.Bson;
 using System.ComponentModel.DataAnnotations;
 
 namespace ChitChat.Service.DTOs.Request

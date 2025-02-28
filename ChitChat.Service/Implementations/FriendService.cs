@@ -39,7 +39,7 @@ namespace ChitChat.Service.Implementations
                 await repoUnit.Users.UpdateAsync(user.Id, user);
             }
             await repoUnit.FriendRequests.DeleteAsync(friendRequestId);
-            return new() { IsSuccess = true, Message = "Friend Request is Canceled Successfully", StatusCode = MyStatusCode.OK };
+            return new() { IsSuccess = true, Message = "Friend Request is Accepted Successfully", StatusCode = MyStatusCode.OK };
         }
 
         public async Task<BaseResult<string>> Add(FriendRequestDto dto)
@@ -82,12 +82,41 @@ namespace ChitChat.Service.Implementations
             return new() { IsSuccess = true, Message = "Friend Request is Canceled Successfully", StatusCode = MyStatusCode.OK };
         }
 
-        public async Task<BaseResult<PagedList<FriendResponseDto>>> GetAll(ItemQueryParams queryParams, string senderId)
+        public async Task<BaseResult<PagedList<FriendResponseDto>>> GetAllSent(ItemQueryParams queryParams, string senderId)
         {
-            var ids = (await repoUnit.Users.GetByIdAsync(senderId)).FriendRequestsIds;
-            var pageList = await repoUnit.Users.GetAllAsync(queryParams, e => e.FriendRequestsIds.Any( id => ids.Contains(id)));
+            var friendRequests = await repoUnit.FriendRequests.FindAsync(f => f.SenderId == senderId);
+            var pageList = await repoUnit.Users.GetAllAsync(queryParams, e => friendRequests.Any(f => f.ReceiverId== e.Id));
             var responsePageList = new PagedList<FriendResponseDto>(
-                                    pageList.Items.Select(item => mapper.Map<FriendResponseDto>(item)).ToList(),
+                                    pageList.Items.Select(user =>
+                                    new FriendResponseDto()
+                                    {
+                                        PictureUrl = user.PictureUrl,
+                                        UserId = user.Id,
+                                        Name = user.Name,
+                                        Id = friendRequests.Where(f => f.ReceiverId == user.Id).First().Id
+                                    }
+                                    ).ToList(),
+                                    pageList.Page,
+                                    pageList.PageSize,
+                                    pageList.TotalCount
+            );
+
+            return new() { IsSuccess = true, Data = responsePageList, Message = Messages.GET_SUCCESS, StatusCode = MyStatusCode.OK };
+        }
+        public async Task<BaseResult<PagedList<FriendResponseDto>>> GetAllReceived(ItemQueryParams queryParams, string senderId)
+        {
+            var friendRequests = await repoUnit.FriendRequests.FindAsync(f => f.ReceiverId == senderId);
+            var pageList = await repoUnit.Users.GetAllAsync(queryParams, e => friendRequests.Any(f => f.SenderId == e.Id));
+            var responsePageList = new PagedList<FriendResponseDto>(
+                                    pageList.Items.Select(user => 
+                                    new FriendResponseDto()
+                                    {
+                                        PictureUrl = user.PictureUrl,
+                                        UserId = user.Id,
+                                        Name = user.Name,
+                                        Id = friendRequests.Where(f => f.SenderId == user.Id).First().Id
+                                    }
+                                    ).ToList(),
                                     pageList.Page,
                                     pageList.PageSize,
                                     pageList.TotalCount
@@ -113,6 +142,20 @@ namespace ChitChat.Service.Implementations
             };
 
             return new() { IsSuccess = true, Data = responseDto, Message = Messages.GET_SUCCESS, StatusCode = MyStatusCode.OK };
+        }
+
+        public async Task<BaseResult<PagedList<UserResponseDto>>> GetAllFriends(ItemQueryParams queryParams, string senderId)
+        {
+
+            var pageList = await repoUnit.Users.GetAllAsync(queryParams, e => e.FriendsIds.Contains(senderId));
+            var responsePageList = new PagedList<UserResponseDto>(
+                                    pageList.Items.Select(user => mapper.Map<UserResponseDto>(user)).ToList(),
+                                    pageList.Page,
+                                    pageList.PageSize,
+                                    pageList.TotalCount
+            );
+
+            return new() { IsSuccess = true, Data = responsePageList, Message = Messages.GET_SUCCESS, StatusCode = MyStatusCode.OK };
         }
     }
 }
