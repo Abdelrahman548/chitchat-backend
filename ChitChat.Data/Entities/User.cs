@@ -55,5 +55,10 @@ namespace ChitChat.Data.Entities
         {
             StoredSearchable = Name;
         }
+
+        public override void PrepareSearchable()
+        {
+            StoredSearchable = Name;
+        }
     }
 }

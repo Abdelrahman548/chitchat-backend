@@ -12,14 +12,19 @@ namespace ChitChat.Repository.Implementations
         where T : Entity
     {
         private readonly IMongoCollection<T> _collection;
-        
+
         public Repository(IMongoDatabase mongoDB, string collectionName)
         {
             _collection = mongoDB.GetCollection<T>(collectionName);
         }
 
         public async Task AddAsync(T entity)
-            => await _collection.InsertOneAsync(entity);
+        {
+            if (entity is SearchableEntity searchable)
+                searchable.PrepareSearchable();
+
+            await _collection.InsertOneAsync(entity);
+        }
 
         public async Task DeleteAsync(string id)
             => await _collection.DeleteOneAsync(e => e.Id == id);
@@ -33,7 +38,12 @@ namespace ChitChat.Repository.Implementations
             => await _collection.Find(e => e.Id == id).FirstOrDefaultAsync();
 
         public async Task UpdateAsync(string id, T entity)
-            => await _collection.ReplaceOneAsync(e => e.Id == id, entity);
+        {
+            if (entity is SearchableEntity searchable)
+                searchable.PrepareSearchable();
+
+            await _collection.ReplaceOneAsync(e => e.Id == id, entity);
+        }
         
 
         public async Task<PagedList<T>> GetAllAsync(ItemQueryParams queryParams, Expression<Func<T, bool>> filterExpression = null)

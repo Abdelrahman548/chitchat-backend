@@ -3,6 +3,7 @@ using ChitChat.Data.Helpers;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
 
 namespace ChitChat.Data.Entities
 {
@@ -25,6 +26,10 @@ namespace ChitChat.Data.Entities
         public string ChatId { get; set; } = string.Empty;
 
         public Message()
+        {
+            StoredSearchable = Text;
+        }
+        public override void PrepareSearchable()
         {
             StoredSearchable = Text;
         }

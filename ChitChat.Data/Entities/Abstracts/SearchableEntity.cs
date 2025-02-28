@@ -6,5 +6,7 @@ namespace ChitChat.Data.Entities.Abstracts
     {
         [BsonElement("searchable")]
         public string StoredSearchable { get; set; } = string.Empty;
+
+        public virtual void PrepareSearchable() { }
     }
 }
