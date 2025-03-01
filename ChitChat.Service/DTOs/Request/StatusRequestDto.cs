@@ -13,7 +13,5 @@ namespace ChitChat.Service.DTOs.Request
         public IFormFile? Payload{ get; set; }
         [Required]
         public ContentType ContentType { get; set; }
-        [Required]
-        public DateTime ExpirationTime { get; set; }
     }
 }

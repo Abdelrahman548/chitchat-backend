@@ -85,8 +85,10 @@ namespace ChitChat.Service.Implementations
         public async Task<BaseResult<PagedList<StatusResponseDto>>> GetAll(string userId, ItemQueryParams queryParams, string senderId)
         {
             var user = await repoUnit.Users.GetByIdAsync(senderId);
-            if(!user.FriendsIds.Contains(userId))
-                return new() { IsSuccess = false, StatusCode = MyStatusCode.BadRequest, Errors = ["Not Found"] };
+            
+            if(userId != senderId)
+                if(!user.FriendsIds.Contains(userId))
+                    return new() { IsSuccess = false, StatusCode = MyStatusCode.BadRequest, Errors = ["Not Found"] };
 
             var pageList = await repoUnit.Statuses.GetAllAsync(queryParams, s => s.UserId == userId);
             var responsePageList = new PagedList<StatusResponseDto>(
@@ -105,9 +107,12 @@ namespace ChitChat.Service.Implementations
             if (status is null)
                 return new() { IsSuccess = false, StatusCode = MyStatusCode.BadRequest, Errors = ["Not Found"] };
 
-            var sender = await repoUnit.Users.GetByIdAsync(senderId);
-            if(!sender.FriendsIds.Contains(status.UserId))
-                return new() { IsSuccess = false, StatusCode = MyStatusCode.BadRequest, Errors = ["Not Found"] };
+            if(senderId != status.UserId)
+            {
+                var sender = await repoUnit.Users.GetByIdAsync(senderId);
+                if (!sender.FriendsIds.Contains(status.UserId))
+                    return new() { IsSuccess = false, StatusCode = MyStatusCode.BadRequest, Errors = ["Not Found"] };
+            }
 
             var responseDto = mapper.Map<StatusResponseDto>(status);
             return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Message = Messages.GET_SUCCESS, Data = responseDto };
