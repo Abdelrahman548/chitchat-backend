@@ -2,7 +2,6 @@
 using ChitChat.Service.DTOs.Response;
 using ChitChat.Service.Helpers;
 using ChitChat.Service.Implementations;
-using ChitChat.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -26,6 +25,7 @@ namespace ChitChat.Web.Controllers
             var result = await services.AuthService.Login(dto);
             return StatusCode((int)result.StatusCode, result);
         }
+
         [HttpPost("refresh")]
         public async Task<ActionResult<BaseResult<LoginResponseDto>>> Refresh(RefreshRequestDto dto)
         {
@@ -48,20 +48,6 @@ namespace ChitChat.Web.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        [Authorize(Roles = "User")]
-        [HttpGet("")]
-        public async Task<ActionResult<BaseResult<UserResponseDto>>> Current()
-        {
-            var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (authId is null)
-            {
-                return Unauthorized(
-                        new BaseResult<string>() { IsSuccess = false, Errors = ["UnAuthenticated"], StatusCode = MyStatusCode.Unauthorized }
-                    );
-            }
-            var result = await services.UserService.GetByID(new(authId));
-            return StatusCode((int)result.StatusCode, result);
-        }
 
         [HttpPost("register")]
         public async Task<ActionResult<BaseResult<string>>> Register(RegisterRequestDto dto)
@@ -83,6 +69,7 @@ namespace ChitChat.Web.Controllers
             var result = await services.AuthService.ForgetPassword(verifyDto);
             return StatusCode((int)result.StatusCode, result);
         }
+        
         [HttpPost("password/reset")]
         public async Task<ActionResult<BaseResult<string>>> ResetPassword(ResetPasswordRequestDto dto)
         {
