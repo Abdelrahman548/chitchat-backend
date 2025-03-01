@@ -5,7 +5,7 @@ using ChitChat.Service.DTOs.Request;
 using ChitChat.Service.DTOs.Response;
 using ChitChat.Service.Helpers;
 using ChitChat.Service.Interfaces;
-using MongoDB.Bson;
+using Microsoft.AspNetCore.Http;
 
 namespace ChitChat.Service.Implementations
 {
@@ -13,11 +13,13 @@ namespace ChitChat.Service.Implementations
     {
         private readonly IUnitOfWork repoUnit;
         private readonly IMapper mapper;
+        private readonly ICloudService cloudService;
 
-        public UserService(IUnitOfWork repoUnit, IMapper mapper)
+        public UserService(IUnitOfWork repoUnit, IMapper mapper, ICloudService cloudService)
         {
             this.repoUnit = repoUnit;
             this.mapper = mapper;
+            this.cloudService = cloudService;
         }
         public async Task<BaseResult<PagedList<UserResponseDto>>> GetAll(ItemQueryParams queryParams, string senderId)
         {
@@ -47,6 +49,33 @@ namespace ChitChat.Service.Implementations
             mapper.Map(dto, user);
             await repoUnit.Users.UpdateAsync(user.Id,user);
             return new() { IsSuccess = true, Message = Messages.UPDATE_SUCCESS, Data = user.Id, StatusCode = MyStatusCode.OK };
+        }
+
+        public async Task<BaseResult<string>> UpdateLastseen(DateTime lastseen, string senderId)
+        {
+            var user = await repoUnit.Users.GetByIdAsync(senderId);
+            if (user is null) return new() { IsSuccess = false, Errors = ["Not Found"], StatusCode = MyStatusCode.NotFound };
+            user.LastSeen = lastseen;
+            await repoUnit.Users.UpdateAsync(user.Id, user);
+            return new() { IsSuccess = true, Message = Messages.UPDATE_SUCCESS, Data = user.Id, StatusCode = MyStatusCode.OK };
+        }
+
+        public async Task<BaseResult<string>> UploadPicture(IFormFile image, string senderId)
+        {
+            var user = await repoUnit.Users.GetByIdAsync(senderId);
+            if (user is null)
+                return new() { IsSuccess = false, StatusCode = MyStatusCode.BadRequest, Errors = ["User is not Found"] };
+
+            var result = await cloudService.UploadImageAsync(image, $"ProfilePicture[{senderId}]");
+            var link = result.Data;
+            if (!result.IsSuccess || link is null || result.StatusCode != MyStatusCode.OK)
+                return result;
+
+            user.PictureUrl = link;
+
+
+            await repoUnit.Users.UpdateAsync(senderId, user);
+            return new() { IsSuccess = true, StatusCode = MyStatusCode.OK, Message = Messages.UPDATE_SUCCESS };
         }
     }
 }
