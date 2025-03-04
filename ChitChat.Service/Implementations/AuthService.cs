@@ -75,13 +75,14 @@ namespace ChitChat.Service.Implementations
 
             var accessToken = tokenService.GenerateAccessToken(users[0]);
             var refreshToken = tokenService.GenerateRefreshToken();
-            
-            RefreshToken refreshTokenRecord;
-            if (string.Empty != users[0].RefreshTokenId)
+
+            RefreshToken refreshTokenRecord = await repoUnit.RefreshTokens.GetByIdAsync(users[0].RefreshTokenId ?? ObjectId.Empty.ToString());
+
+            if (refreshTokenRecord is not null)
             {
-                refreshTokenRecord = await repoUnit.RefreshTokens.GetByIdAsync(users[0].RefreshTokenId);
                 refreshTokenRecord.Token = refreshToken;
                 refreshTokenRecord.IsUsed = false;
+                await repoUnit.RefreshTokens.UpdateAsync(refreshTokenRecord.Id, refreshTokenRecord);
             }
             else
             {

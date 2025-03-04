@@ -31,7 +31,7 @@ namespace ChitChat.Data.Entities
 
         // Nav
         [BsonRepresentation(BsonType.ObjectId)]
-        public string RefreshTokenId { get; set; } = string.Empty;
+        public string? RefreshTokenId { get; set; }
         
         [BsonRepresentation(BsonType.ObjectId)]
         public ICollection<string> GroupsIds { get; set; } = [];
