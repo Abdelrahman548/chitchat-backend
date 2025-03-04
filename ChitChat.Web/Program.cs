@@ -18,8 +18,14 @@ builder.Services.AddApplicationService();
 //// Configurations Loading ////
 builder.Services.AddOptionsService(builder.Configuration);
 
+var loggerFactory = LoggerFactory.Create(builder =>
+{
+    builder.AddConsole();
+});
+var logger = loggerFactory.CreateLogger("Program");
+
 //// DB Context Injection ////
-builder.Services.AddDbService(builder.Configuration);
+builder.Services.AddDbService(builder.Configuration, logger);
 
 //// Apply Authentication ////
 builder.Services.AddAuthenticationService(builder.Configuration);

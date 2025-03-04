@@ -6,7 +6,7 @@ namespace ChitChat.Web.Extensions
 {
     public static class DbServiceExtension
     {
-        public static void AddDbService(this IServiceCollection services, IConfiguration configuration)
+        public static void AddDbService(this IServiceCollection services, IConfiguration configuration, ILogger logger)
         {
             services.Configure<MongoDBOptions>(configuration.GetSection("MongoDB"));
             var mongoSettings = configuration.GetSection("MongoDB").Get<MongoDBOptions>(); ;
@@ -16,6 +16,8 @@ namespace ChitChat.Web.Extensions
                 try
                 {
                     mongoClient = new MongoClient(mongoSettings.ConnectionString);
+
+                    logger.LogInformation("MongoDB connected successfully using ConnectionString: {ConnectionString}, Database: {DatabaseName}", mongoSettings.ConnectionString, mongoSettings.DatabaseName);
 
                     services.AddSingleton<IMongoClient>(sp =>
                     {
@@ -29,10 +31,14 @@ namespace ChitChat.Web.Extensions
                         return client.GetDatabase(settings.DatabaseName);
                     });
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Console.WriteLine("Something Went Wrong in MonogDB Connection");
+                    logger.LogError(ex, "Failed to connect to MongoDB using ConnectionString: {ConnectionString}, Database: {DatabaseName}", mongoSettings.ConnectionString, mongoSettings.DatabaseName);
                 }
+            }
+            else
+            {
+                logger.LogError("MongoDB settings are null. Please check your configuration.");
             }
         }
     }
