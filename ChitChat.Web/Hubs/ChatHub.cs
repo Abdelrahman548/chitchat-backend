@@ -1,6 +1,7 @@
 ﻿using ChitChat.Service.DTOs.Request;
 using ChitChat.Service.Implementations;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
@@ -16,7 +17,7 @@ namespace ChitChat.Web.Hubs
             this.services = services;
         }
 
-        public async Task SendMessage(string receiverId, MessageRequestDto message)
+        public async Task SendMessage([FromQuery]string receiverId, MessageRequestDto message)
         {
             string senderId = GetUserId();
             message.ReceiverId = receiverId;

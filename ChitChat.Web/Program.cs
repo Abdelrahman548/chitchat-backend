@@ -1,4 +1,5 @@
 using ChitChat.Web.Extensions;
+using ChitChat.Web.Hubs;
 using ChitChat.Web.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,6 +37,22 @@ builder.Services.AddModelStateResponseService();
 //// Change Model State Response Behavior ////
 builder.Services.AddMemoryCache();
 
+//// Add SignalR ////
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -56,5 +73,9 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseWebSockets();
+app.UseCors("AllowAll");
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();
